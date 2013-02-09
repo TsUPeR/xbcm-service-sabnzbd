@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <!-- Label -->
+    <string id="30000">Pause SABnzbd when playing media</string>
+    <string id="30001">Throttle SABnzbd when playing media (KB/S)</string>
+    <string id="30002">Show notification</string>
+</strings>
