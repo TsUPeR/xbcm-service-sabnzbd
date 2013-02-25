@@ -25,27 +25,34 @@
 import xbmc
 import xbmcaddon
 
+import re
+
 __settings__ = xbmcaddon.Addon(id='script.service.sabnzbd')
 __icon__ = __settings__.getAddonInfo("icon")
 
 IS_PAUSED = __settings__.getSetting('sab_paused').lower() == 'true'
 SPEED = __settings__.getSetting('sab_speed').lower()
+ONLINE_ONLY = __settings__.getSetting('online_only').lower() == 'true'
 SHOW_NOTIFICATION = __settings__.getSetting('show_notification').lower() == 'true'
 
 class XBMCPlayer(xbmc.Player):
     def __init__( self, *args, **kwargs ):
-        self.is_playing = False
-        self.is_ended = False
-        self.is_stopped = False
+        self.script_controlled = False
 
     def onPlayBackStarted( self ):
-        self.is_playing = True
+        if not (ONLINE_ONLY and is_local_file()):
+            pause()
+            self.script_controlled = True
 
     def onPlayBackEnded( self ):
-        self.is_ended = True
+        if self.script_controlled:
+            resume()
+            self.script_controlled = False
 
     def onPlayBackStopped( self ):
-        self.is_stopped = True
+        if self.script_controlled:
+            resume()
+            self.script_controlled = False
 
     def sleep(self, s):
         xbmc.sleep(s)
@@ -73,14 +80,12 @@ def resume():
             xbmc.executebuiltin('Notification("PauseSABnzbdService", "Speed reset", 500, %s)' % __icon__)
         xbmc.executebuiltin('XBMC.RunPlugin(plugin://plugin.program.sabnzbd/?mode=sab_action&sab_mode=config&sab_name=speedlimit&sab_value=)')
 
+def is_local_file():
+    RE_ONLINE = '^http|^rt|^ftp|^mms'
+    if re.search(RE_ONLINE, player.getPlayingFile(), re.IGNORECASE):
+        return False
+    else:
+        return True
+
 while (not xbmc.abortRequested):
     player.sleep(500)
-    if player.is_playing:
-        pause()
-        player.is_playing = False
-    if player.is_stopped:
-        resume()
-        player.is_stopped = False
-    if player.is_ended:
-        resume()
-        player.is_ended = False

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
   <category>
+    <setting id="online_only" type="bool" label="30003" default="true"/>
     <setting id="sab_paused" type="bool" label="30000" default="true"/>
     <setting id="sab_speed" type="number" label="30001" enable="eq(-1,false)" default=""/>
     <setting id="show_notification" type="bool" label="30002" default="false"/>
